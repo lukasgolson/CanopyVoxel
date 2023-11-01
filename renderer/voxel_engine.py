@@ -1,0 +1,110 @@
+import os
+import sys
+from typing import Callable
+
+import moderngl as mgl
+import pygame as pg
+
+from .flying_camera import FlyingCamera
+from .scene import Scene
+from .shader_program import ShaderProgram
+from .world import *
+
+
+class VoxelEngine:
+    def __init__(self, custom_update=None, bg_color=glm.vec3(0.15, 0.05, 0.05)):
+        self.window_has_focus = False
+        self.scene = None
+        self.shader_program = None
+        self.player = None
+
+        self.bg_color = bg_color
+
+        self.updates: list[Callable] = list()
+
+        if custom_update is not None:
+            self.updates.append(custom_update)
+
+        pg.init()
+
+        package_dir = os.path.dirname(__file__)
+        pygame_icon = pg.image.load(os.path.join(package_dir, 'assets', 'video-camera.png'))
+        pg.display.set_icon(pygame_icon)
+
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)
+        pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)
+
+        pg.display.set_mode(WIN_RES, flags=pg.OPENGL | pg.DOUBLEBUF)
+        self.ctx = mgl.create_context()
+
+        self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.CULL_FACE | mgl.BLEND)
+        self.ctx.gc_mode = 'auto'
+
+        self.clock = pg.time.Clock()
+        self.delta_time = 0
+        self.time = 0
+
+        self.is_running = True
+        self.on_init()
+
+    def on_init(self):
+        self.player = FlyingCamera(self, position=(0,0,0))
+        self.shader_program = ShaderProgram(self)
+        self.scene = Scene(self)
+
+        self.updates.append(self.player.update)
+        self.updates.append(self.shader_program.update)
+        self.updates.append(self.scene.update)
+
+    def update(self):
+        for update_function in self.updates:
+            update_function(self)
+
+        self.delta_time = self.clock.tick()
+        self.time = pg.time.get_ticks() * 0.001
+        pg.display.set_caption("Canopy Voxelation Renderer")
+
+    def render(self):
+        self.ctx.clear(color=self.bg_color)
+        self.scene.render()
+        pg.display.flip()
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.is_running = False
+
+            if event.type == pg.QUIT:
+                pg.quit()
+                sys.exit()
+            elif event.type == pg.ACTIVEEVENT:
+                if event.gain == 1:  # Window has gained focus
+                    self.window_has_focus = True
+                    pg.event.set_grab(True)
+                    pg.mouse.set_visible(False)
+                elif event.gain == 0:  # Window has lost focus
+                    self.window_has_focus = False
+                    pg.event.set_grab(False)
+                    pg.mouse.set_visible(True)
+
+            if self.window_has_focus:
+                if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                    self.window_has_focus = False
+                    pg.event.set_grab(False)
+                    pg.mouse.set_visible(True)
+
+                if event.type == pg.KEYDOWN and event.key == pg.K_F11:
+                    pg.display.toggle_fullscreen()
+
+    def run(self):
+        while self.is_running:
+            self.step()
+        pg.quit()
+        sys.exit()
+
+    def step(self):
+        self.handle_events()
+        self.update()
+        self.render()
