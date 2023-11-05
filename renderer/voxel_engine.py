@@ -12,7 +12,7 @@ from .world import *
 
 
 class VoxelEngine:
-    def __init__(self, custom_update=None, bg_color=glm.vec3(0.15, 0.05, 0.05)):
+    def __init__(self, custom_update=None, custom_init=None, world_size=(8, 8, 8), chunk_size=32, bg_color=glm.vec3(0.15, 0.05, 0.05)):
         self.window_has_focus = False
         self.scene = None
         self.shader_program = None
@@ -21,9 +21,16 @@ class VoxelEngine:
         self.bg_color = bg_color
 
         self.updates: list[Callable] = list()
+        self.inits: list[Callable] = list()
 
         if custom_update is not None:
             self.updates.append(custom_update)
+
+        if custom_init is not None:
+            self.inits.append(custom_init)
+
+        self.world_size = world_size
+        self.chunk_size = chunk_size
 
         pg.init()
 
@@ -50,13 +57,16 @@ class VoxelEngine:
         self.on_init()
 
     def on_init(self):
-        self.player = FlyingCamera(self, position=(0,0,0))
+        self.player = FlyingCamera(self, position=(0, 0, 0))
         self.shader_program = ShaderProgram(self)
-        self.scene = Scene(self)
+        self.scene = Scene(self, self.world_size, self.chunk_size)
 
         self.updates.append(self.player.update)
         self.updates.append(self.shader_program.update)
         self.updates.append(self.scene.update)
+
+        for init_function in self.inits:
+            init_function(self)
 
     def update(self):
         for update_function in self.updates:

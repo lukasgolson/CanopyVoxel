@@ -1,6 +1,6 @@
 import numpy as np
 
-from renderer.updates.sphere_demo import Demo
+from renderer.addons.sphere_demo import Demo
 from renderer.voxel_engine import VoxelEngine
 
 
@@ -29,6 +29,9 @@ def render_3d_array(voxel_array: np.ndarray):
     app.step()
 
     len_x, len_y, len_z, len_channels = voxel_array.shape
+
+    chunk_size = 32
+    world_dims = (int(len_x / chunk_size) + 1, int(len_y / chunk_size) + 1, int(len_z / chunk_size) + 1)
 
     center_x = len_x / 2
     center_z = len_z / 2
