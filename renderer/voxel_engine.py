@@ -58,7 +58,9 @@ class VoxelEngine:
         self.on_init(voxel_array=voxel_array)
 
     def on_init(self, voxel_array=None):
-        self.player = FlyingCamera(self, position=(0, 0, 0))
+        self.player = FlyingCamera(self, position=(
+            int(self.world_size[0] * self.chunk_size / 2), self.world_size[1] * self.chunk_size,
+            int(self.world_size[2] * self.chunk_size / 2)), yaw=-90)
         self.shader_program = ShaderProgram(self)
         self.scene = Scene(self, self.world_size, self.chunk_size, voxel_array=voxel_array)
 

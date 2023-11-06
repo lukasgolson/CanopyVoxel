@@ -53,11 +53,3 @@ if __name__ == "__main__":
     voxel_grid[..., 4] = np.minimum(voxel_grid[..., 3] / percentile_90, 1)
 
     np.save("data.grid", voxel_grid)
-
-
-
-    # Load QSM model; convert to point cloud; align to voxel grid
-    # qsm_mesh_data = o3d.io.read_triangle_mesh(qsm_mesh_file_name)
-    # qsm_pointcloud_Data = qsm_mesh_data.sample_points_poisson_disk(number_of_points=5000, init_factor=5)
-
-    # Detect ground plane voxels; remove them. Isolate the canopy
