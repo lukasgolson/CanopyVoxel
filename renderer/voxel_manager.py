@@ -10,18 +10,18 @@ class VoxelManager:
         self.chunks = world.chunks
 
     def add_voxel(self, world_pos, color):
-        if color != (0, 0, 0):
-            _, voxel_index, _, chunk = self.get_voxel_id(world_pos)
 
-            if isinstance(chunk, int):
-                print(f"Invalid world coordinate {world_pos} when trying to place voxel.")
-                return
+        _, voxel_index, _, chunk = self.get_voxel_id(world_pos)
 
-            chunk.voxels[voxel_index] = color
-            chunk.mesh.rebuild()
+        if isinstance(chunk, int):
+            print(f"Invalid world coordinate {world_pos} when trying to place voxel.")
+            return
 
-            if chunk.is_empty:
-                chunk.is_empty = False
+        chunk.voxels[voxel_index] = color
+        chunk.mesh.rebuild()
+
+        if chunk.is_empty:
+            chunk.is_empty = False
 
     def remove_voxel(self, world_pos):
         _, voxel_index, voxel_local_pos, chunk = self.get_voxel_id(world_pos)

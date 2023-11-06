@@ -12,7 +12,8 @@ from .world import *
 
 
 class VoxelEngine:
-    def __init__(self, custom_update=None, custom_init=None, world_size=(8, 8, 8), chunk_size=32, bg_color=glm.vec3(0.15, 0.05, 0.05)):
+    def __init__(self, custom_update=None, custom_init=None, world_size=(8, 8, 8), chunk_size=32,
+                 bg_color=glm.vec3(0.15, 0.05, 0.05), voxel_array=None):
         self.window_has_focus = False
         self.scene = None
         self.shader_program = None
@@ -54,12 +55,12 @@ class VoxelEngine:
         self.time = 0
 
         self.is_running = True
-        self.on_init()
+        self.on_init(voxel_array=voxel_array)
 
-    def on_init(self):
+    def on_init(self, voxel_array=None):
         self.player = FlyingCamera(self, position=(0, 0, 0))
         self.shader_program = ShaderProgram(self)
-        self.scene = Scene(self, self.world_size, self.chunk_size)
+        self.scene = Scene(self, self.world_size, self.chunk_size, voxel_array=voxel_array)
 
         self.updates.append(self.player.update)
         self.updates.append(self.shader_program.update)
@@ -74,6 +75,7 @@ class VoxelEngine:
 
         self.delta_time = self.clock.tick()
         self.time = pg.time.get_ticks() * 0.001
+
         pg.display.set_caption("Canopy Voxelation Renderer")
 
     def render(self):

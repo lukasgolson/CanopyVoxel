@@ -14,7 +14,7 @@ class Chunk:
         self.voxels: np.array = np.zeros((world.chunk_volume, 3), dtype='uint8')
         self.mesh: ChunkMesh = None
         self.is_empty = True
-        self.is_dirty = False
+        self.is_dirty = True
 
     def get_model_matrix(self):
         m_model = glm.translate(glm.mat4(), glm.vec3(self.position) * self.world.chunk_size)
@@ -37,18 +37,3 @@ class Chunk:
         if not self.is_empty:
             self.set_uniform()
             self.mesh.render()
-
-    def build_voxels(self):
-        # empty chunk
-        voxels = np.zeros((self.world.chunk_volume, 3), dtype='uint8')
-
-        self.is_dirty = True
-        return voxels
-
-    def set_chunk_voxels(self, voxels):
-        self.voxels = voxels
-
-        if np.any(voxels):
-            self.is_empty = False
-
-        self.mesh.rebuild()
