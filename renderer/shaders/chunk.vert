@@ -21,9 +21,14 @@ const int uv_indices[12] = int[12](
     3, 0, 2, 3, 1, 0   // odd face
 );
 
-vec3 normalize_color(ivec3 vec){
+vec3 normalize_color(vec3 vec){
     vec3 p3 = vec.xyz / 255.0; // Normalize color values to the range [0.0, 1.0]
     return p3;
+}
+
+vec3 gray_scale(ivec3 vec){
+    float gray = dot(vec.xyz, vec3(0.2126, 0.7152, 0.0722));
+    return vec3(gray);
 }
 
 

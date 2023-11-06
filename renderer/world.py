@@ -60,8 +60,7 @@ class World:
                                     if chunk_x < voxel_array.shape[0] and chunk_y < voxel_array.shape[1] and chunk_z < \
                                             voxel_array.shape[2]:
                                         # overwrite the voxel data in self.voxels with the voxel data from voxel_array
-                                        self.voxels[chunk_index][voxel_index] = voxel_array[chunk_x, chunk_y, chunk_z,
-                                                                                :3]
+                                        self.voxels[chunk_index][voxel_index] = voxel_array[chunk_x, chunk_y, chunk_z,:3]
 
                     chunk.voxels = self.voxels[chunk_index]
 
